@@ -22,7 +22,7 @@ namespace Converter_Ver3
             }
         }
 
-        public static byte[] Resize(byte[] data, int width)
+        public static byte[] Resize(byte[] data, int width, int height)
         {
             ImageFormat format = getImageFormat(data);
 
@@ -30,7 +30,7 @@ namespace Converter_Ver3
             {
                 Image image = Image.FromStream(stream);
 
-                int height = (width * image.Height) / image.Width;
+                //int height = (width * image.Height) / image.Width;
                 Image thumbnail = image.GetThumbnailImage(width, height, null, IntPtr.Zero);
 
                 using (MemoryStream thumbnailStream = new MemoryStream())

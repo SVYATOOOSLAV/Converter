@@ -27,102 +27,116 @@ namespace Converter_Ver3
         }
 
         string path = "";
+        byte[] data = null;
         byte[] resultBytes = null;
         int trackBarValue = -1;
         string formatOutputFile = null;
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if(textBox1.Text != "" && comboBox1.Text != "" && comboBox2.Text != "" && (comboBox3.Text != "" || trackBarValue != -1))
+            if(button3.Text == "Изменить путь" && textBox1.Text != "" && comboBox1.Text != "" && comboBox2.Text != "" 
+                && (comboBox3.Text != "" || trackBarValue != -1))
             {
-                byte[] data = File.ReadAllBytes(path);
-                formatOutputFile = comboBox1.Text;
-                string imageResolution = comboBox2.Text;
-
-                switch (formatOutputFile)
+                if (File.Exists(textBox1.Text))
                 {
-                    case "Jpeg":
-                        resultBytes = Jpeg.AsJpeg(data);
-                        switch (imageResolution)
-                        {
-                            case "Default":
-                                break;
-                            case "HD (1280 x 720)":
-                                resultBytes = Converter.Resize(resultBytes, 1280);
-                                break;
-                            case "Full HD (1920 x 1080)":
-                                resultBytes = Converter.Resize(resultBytes, 1920);
-                                break;
-                            case "Quad HD (2560 x 1440)":
-                                resultBytes = Converter.Resize(resultBytes, 2560);
-                                break;
-                            case "4K (3840 x 2160)":
-                                resultBytes = Converter.Resize(resultBytes, 3840);
-                                break;
-                        }
-                        break;
-                    case "Png":
-                        resultBytes = Png.AsPng(data);
-                        switch (imageResolution)
-                        {
-                            case "Default":
-                                break;
-                            case "HD (1280 x 720)":
-                                resultBytes = Converter.Resize(resultBytes, 1280);
-                                break;
-                            case "Full HD (1920 x 1080)":
-                                resultBytes = Converter.Resize(resultBytes, 1920);
-                                break;
-                            case "Quad HD (2560 x 1440)":
-                                resultBytes = Converter.Resize(resultBytes, 2560);
-                                break;
-                            case "4K (3840 x 2160)":
-                                resultBytes = Converter.Resize(resultBytes, 3840);
-                                break;
-                        }
-                        break;
-                    case "Gif":
-                        resultBytes = Gif.AsGif(data);
-                        switch (imageResolution)
-                        {
-                            case "Default":
-                                break;
-                            case "HD (1280 x 720)":
-                                resultBytes = Converter.Resize(resultBytes, 1280);
-                                break;
-                            case "Full HD (1920 x 1080)":
-                                resultBytes = Converter.Resize(resultBytes, 1920);
-                                break;
-                            case "Quad HD (2560 x 1440)":
-                                resultBytes = Converter.Resize(resultBytes, 2560);
-                                break;
-                            case "4K (3840 x 2160)":
-                                resultBytes = Converter.Resize(resultBytes, 3840);
-                                break;
-                        }
-                        break;
-                }
+                    formatOutputFile = comboBox1.Text;
+                    string imageResolution = comboBox2.Text;
 
-                if (formatOutputFile == "Jpeg")
+                    switch (formatOutputFile)
+                    {
+                        case "Jpeg":
+                            resultBytes = Jpeg.AsJpeg(data);
+                            switch (imageResolution)
+                            {
+                                case "Default":
+                                    break;
+                                case "HD (1280 x 720)":
+                                    resultBytes = Converter.Resize(resultBytes, 1280, 720);
+                                    break;
+                                case "Full HD (1920 x 1080)":
+                                    resultBytes = Converter.Resize(resultBytes, 1920, 1080);
+                                    break;
+                                case "Quad HD (2560 x 1440)":
+                                    resultBytes = Converter.Resize(resultBytes, 2560, 1440);
+                                    break;
+                                case "4K (3840 x 2160)":
+                                    resultBytes = Converter.Resize(resultBytes, 3840, 2160);
+                                    break;
+                            }
+                            break;
+                        case "Png":
+                            resultBytes = Png.AsPng(data);
+                            switch (imageResolution)
+                            {
+                                case "Default":
+                                    break;
+                                case "HD (1280 x 720)":
+                                    resultBytes = Converter.Resize(resultBytes, 1280, 720);
+                                    break;
+                                case "Full HD (1920 x 1080)":
+                                    resultBytes = Converter.Resize(resultBytes, 1920, 1080);
+                                    break;
+                                case "Quad HD (2560 x 1440)":
+                                    resultBytes = Converter.Resize(resultBytes, 2560, 1440);
+                                    break;
+                                case "4K (3840 x 2160)":
+                                    resultBytes = Converter.Resize(resultBytes, 3840, 2160);
+                                    break;
+                            }
+                            break;
+                        case "Gif":
+                            resultBytes = Gif.AsGif(data);
+                            switch (imageResolution)
+                            {
+                                case "Default":
+                                    break;
+                                case "HD (1280 x 720)":
+                                    resultBytes = Converter.Resize(resultBytes, 1280, 720);
+                                    break;
+                                case "Full HD (1920 x 1080)":
+                                    resultBytes = Converter.Resize(resultBytes, 1920, 1080);
+                                    break;
+                                case "Quad HD (2560 x 1440)":
+                                    resultBytes = Converter.Resize(resultBytes, 2560, 1440);
+                                    break;
+                                case "4K (3840 x 2160)":
+                                    resultBytes = Converter.Resize(resultBytes, 3840, 2160);
+                                    break;
+                            }
+                            break;
+                    }
+
+                    if (formatOutputFile == "Jpeg")
+                    {
+                        resultBytes = Jpeg.JPGCompress(resultBytes, trackBarValue);
+                    }
+
+                    if (formatOutputFile == "Png" && comboBox3.SelectedIndex == 0)
+                    {
+                        resultBytes = Png.transparency(resultBytes);
+                    }
+
+                    if (formatOutputFile == "Gif" && comboBox3.SelectedIndex == 0)
+                    {
+                        resultBytes = Gif.LZWCompress(resultBytes);
+                    }
+
+
+                    label6.Visible = true;
+                    showPicture(pictureBox2, resultBytes);
+
+                    using (MemoryStream ms = new MemoryStream(resultBytes))
+                    {
+                        Image image = Image.FromStream(ms);
+                        Bitmap bm = new Bitmap(image);
+
+                        label6.Text = $"Стало ({comboBox1.Text.ToLower()}, {image.Width}x{image.Height})";
+                    }
+                }
+                else
                 {
-                    resultBytes = Jpeg.JPGCompress(resultBytes, trackBarValue);
+                    MessageBox.Show("Файл не найден, проверьте путь", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
-                if (formatOutputFile == "Png" && comboBox3.SelectedIndex == 0)
-                {
-                    resultBytes = Png.transparency(resultBytes);
-                }
-
-                if (formatOutputFile == "Gif" && comboBox3.SelectedIndex == 0)
-                {
-                    resultBytes = Gif.LZWCompress(resultBytes);
-                }
-
-                label5.Visible = true;
-                label6.Visible = true;
-
-                showPicture(pictureBox1, data);
-                showPicture(pictureBox2, resultBytes);
             }
             else
             {
@@ -135,16 +149,19 @@ namespace Converter_Ver3
             using (MemoryStream inStream = new MemoryStream(data))
             {
                 Image image = Image.FromStream(inStream);
-
+                pictureBox.Height = pictureBox.Width * image.Height / image.Width;
                 pictureBox.Image = image;
             }
         }
 
         private void Form1_DragDrop(object sender, DragEventArgs e)
         {
-            string[] temp = (string[])e.Data.GetData(DataFormats.FileDrop);
-            path = temp[0];
-            textBox1.Text = path;
+            if(button3.Text != "Изменить путь")
+            {
+                string[] temp = (string[])e.Data.GetData(DataFormats.FileDrop);
+                path = temp[0];
+                textBox1.Text = path;
+            }
         }
 
         private void Form1_DragEnter(object sender, DragEventArgs e)
@@ -230,6 +247,34 @@ namespace Converter_Ver3
         {
             textBox2.Text = trackBar1.Value.ToString();
             trackBarValue = trackBar1.Value;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if(button3.Text == "Сохранить путь")
+            {
+                updateInfoAboutImage();
+
+                textBox1.ReadOnly = true;
+                button3.Text = "Изменить путь";
+            }
+            else
+            {
+                textBox1.ReadOnly = false;
+                button3.Text = "Сохранить путь";
+            }
+        }
+
+        private void updateInfoAboutImage()
+        {
+            if (File.Exists(textBox1.Text))
+            {
+                label5.Visible = true;
+                data = File.ReadAllBytes(path);
+                showPicture(pictureBox1, data);
+                Bitmap image = new Bitmap(path);
+                label5.Text = $"Было ({textBox1.Text.Substring(textBox1.Text.LastIndexOf('.') + 1)}, {image.Width}x{image.Height})";
+            }
         }
     }
 }

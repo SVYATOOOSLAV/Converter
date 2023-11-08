@@ -66,7 +66,7 @@ namespace Converter_Ver3
             using (MemoryStream outStream = new MemoryStream())
             {
                 Image image = Image.FromStream(inStream);
-                
+
                 var qualityEncoder = Encoder.Quality;
 
                 EncoderParameters encoderParameters = new EncoderParameters(1);
@@ -90,7 +90,7 @@ namespace Converter_Ver3
                 var compressEncoder = Encoder.Compression;
 
                 EncoderParameters encoderParameters = new EncoderParameters(1);
-                encoderParameters.Param[0] = new EncoderParameter(compressEncoder, (long) EncoderValue.VersionGif87);
+                encoderParameters.Param[0] = new EncoderParameter(compressEncoder, (long)EncoderValue.CompressionLZW);
                 image.Save(outStream, pictureEncoder, encoderParameters);
 
                 return outStream.ToArray();
@@ -120,7 +120,7 @@ namespace Converter_Ver3
         public static byte[] transparency(byte[] data)
         {
             Image pict = null;
-            using(MemoryStream inStream = new MemoryStream(data))
+            using (MemoryStream inStream = new MemoryStream(data))
             {
                 pict = Image.FromStream(inStream);
             }
@@ -171,8 +171,5 @@ namespace Converter_Ver3
                 }
             }
         }
-
-
-
     }
 }

@@ -161,6 +161,8 @@ namespace Converter_Ver3
                 string[] temp = (string[])e.Data.GetData(DataFormats.FileDrop);
                 path = temp[0];
                 textBox1.Text = path;
+                updateInfoAboutImage();
+                button3.Text = "Изменить путь";
             }
         }
 
@@ -253,13 +255,15 @@ namespace Converter_Ver3
         {
             if(button3.Text == "Сохранить путь")
             {
-                updateInfoAboutImage();
-
-                textBox1.ReadOnly = true;
-                button3.Text = "Изменить путь";
+                updateInfoAboutImage(); 
             }
             else
             {
+                pictureBox1.Image = null;
+                pictureBox2.Image = null;
+                label5.Text = "";
+                label6.Text = "";
+                panel1.BackColor = Color.White;
                 textBox1.ReadOnly = false;
                 button3.Text = "Сохранить путь";
             }
@@ -269,11 +273,15 @@ namespace Converter_Ver3
         {
             if (File.Exists(textBox1.Text))
             {
+                path = textBox1.Text;
                 label5.Visible = true;
                 data = File.ReadAllBytes(path);
                 showPicture(pictureBox1, data);
                 Bitmap image = new Bitmap(path);
                 label5.Text = $"Было ({textBox1.Text.Substring(textBox1.Text.LastIndexOf('.') + 1)}, {image.Width}x{image.Height})";
+                panel1.BackColor = image.GetPixel(0, 0);
+                textBox1.ReadOnly = true;
+                button3.Text = "Изменить путь";
             }
         }
     }

@@ -30,7 +30,6 @@ namespace Converter_Ver3
             {
                 Image image = Image.FromStream(stream);
 
-                //int height = (width * image.Height) / image.Width;
                 Image thumbnail = image.GetThumbnailImage(width, height, null, IntPtr.Zero);
 
                 using (MemoryStream thumbnailStream = new MemoryStream())
@@ -79,6 +78,22 @@ namespace Converter_Ver3
 
         public static byte[] LZWCompress(byte[] data)
         {
+            //ImageFormat format = getImageFormat(data);
+            //ImageCodecInfo pictureEncoder = GetEncoder(format);
+
+            //using (MemoryStream inStream = new MemoryStream(data))
+            //using (MemoryStream outStream = new MemoryStream())
+            //{
+            //    Image image = Image.FromStream(inStream);
+
+            //    var compressEncoder = Encoder.Compression;
+
+            //    EncoderParameters encoderParameters = new EncoderParameters(1);
+            //    encoderParameters.Param[0] = new EncoderParameter(compressEncoder, (long)EncoderValue.CompressionLZW);
+            //    image.Save(outStream, pictureEncoder, encoderParameters);
+
+            //    return outStream.ToArray();
+            //}
             ImageFormat format = getImageFormat(data);
             ImageCodecInfo pictureEncoder = GetEncoder(format);
 
@@ -87,10 +102,10 @@ namespace Converter_Ver3
             {
                 Image image = Image.FromStream(inStream);
 
-                var compressEncoder = Encoder.Compression;
+                var qualityEncoder = Encoder.Quality;
 
                 EncoderParameters encoderParameters = new EncoderParameters(1);
-                encoderParameters.Param[0] = new EncoderParameter(compressEncoder, (long)EncoderValue.CompressionLZW);
+                encoderParameters.Param[0] = new EncoderParameter(qualityEncoder, 1000);
                 image.Save(outStream, pictureEncoder, encoderParameters);
 
                 return outStream.ToArray();
@@ -117,7 +132,7 @@ namespace Converter_Ver3
             }
         }
 
-        public static byte[] transparency(byte[] data)
+        public static byte[] transparency(byte[] data, int redPixel, int greenPixel, int bluePixel)
         {
             Image pict = null;
             using (MemoryStream inStream = new MemoryStream(data))
@@ -148,7 +163,7 @@ namespace Converter_Ver3
                                 Color pixelColor = newImage.GetPixel(x, y);
 
                                 // Например, установка полной прозрачности (A=0) для пикселей с определенным условием
-                                if (pixelColor.R > 100) // Ваше условие для изменения прозрачности
+                                if (pixelColor.R > redPixel && pixelColor.B > bluePixel && pixelColor.G > greenPixel) // Ваше условие для изменения прозрачности
                                 {
                                     pixelColor = Color.FromArgb(0, pixelColor);
                                 }
@@ -158,7 +173,6 @@ namespace Converter_Ver3
                             }
                         }
                     }
-                    //newImage.Save("image_with_transparency.png", ImageFormat.Png);
 
                     byte[] imageBytes;
                     using (MemoryStream ms = new MemoryStream())

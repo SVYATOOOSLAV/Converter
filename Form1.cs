@@ -24,118 +24,82 @@ namespace Converter_Ver3
             comboBox3.Visible = false;
             label5.Visible = false;
             label6.Visible = false;
+            panel2.Visible = false;
         }
 
         string path = "";
         byte[] data = null;
         byte[] resultBytes = null;
-        int trackBarValue = -1;
         string formatOutputFile = null;
+
+        private void createResolution(string imageResolution)
+        {
+            switch (imageResolution)
+            {
+                case "Default":
+                    break;
+                case "HD (1280 x 720)":
+                    resultBytes = Converter.Resize(resultBytes, 1280, 720);
+                    break;
+                case "Full HD (1920 x 1080)":
+                    resultBytes = Converter.Resize(resultBytes, 1920, 1080);
+                    break;
+                case "Quad HD (2560 x 1440)":
+                    resultBytes = Converter.Resize(resultBytes, 2560, 1440);
+                    break;
+                case "4K (3840 x 2160)":
+                    resultBytes = Converter.Resize(resultBytes, 3840, 2160);
+                    break;
+            }
+        }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            if(button3.Text == "Изменить путь" && textBox1.Text != "" && comboBox1.Text != "" && comboBox2.Text != "" 
-                && (comboBox3.Text != "" || trackBarValue != -1))
+            if (button3.Text == "Изменить путь" && textBox1.Text != "" && comboBox1.Text != "" && comboBox2.Text != "")
             {
-                if (File.Exists(textBox1.Text))
+                formatOutputFile = comboBox1.Text;
+                string imageResolution = comboBox2.Text;
+
+                switch (formatOutputFile)
                 {
-                    formatOutputFile = comboBox1.Text;
-                    string imageResolution = comboBox2.Text;
-
-                    switch (formatOutputFile)
-                    {
-                        case "Jpeg":
-                            resultBytes = Jpeg.AsJpeg(data);
-                            switch (imageResolution)
-                            {
-                                case "Default":
-                                    break;
-                                case "HD (1280 x 720)":
-                                    resultBytes = Converter.Resize(resultBytes, 1280, 720);
-                                    break;
-                                case "Full HD (1920 x 1080)":
-                                    resultBytes = Converter.Resize(resultBytes, 1920, 1080);
-                                    break;
-                                case "Quad HD (2560 x 1440)":
-                                    resultBytes = Converter.Resize(resultBytes, 2560, 1440);
-                                    break;
-                                case "4K (3840 x 2160)":
-                                    resultBytes = Converter.Resize(resultBytes, 3840, 2160);
-                                    break;
-                            }
-                            break;
-                        case "Png":
-                            resultBytes = Png.AsPng(data);
-                            switch (imageResolution)
-                            {
-                                case "Default":
-                                    break;
-                                case "HD (1280 x 720)":
-                                    resultBytes = Converter.Resize(resultBytes, 1280, 720);
-                                    break;
-                                case "Full HD (1920 x 1080)":
-                                    resultBytes = Converter.Resize(resultBytes, 1920, 1080);
-                                    break;
-                                case "Quad HD (2560 x 1440)":
-                                    resultBytes = Converter.Resize(resultBytes, 2560, 1440);
-                                    break;
-                                case "4K (3840 x 2160)":
-                                    resultBytes = Converter.Resize(resultBytes, 3840, 2160);
-                                    break;
-                            }
-                            break;
-                        case "Gif":
-                            resultBytes = Gif.AsGif(data);
-                            switch (imageResolution)
-                            {
-                                case "Default":
-                                    break;
-                                case "HD (1280 x 720)":
-                                    resultBytes = Converter.Resize(resultBytes, 1280, 720);
-                                    break;
-                                case "Full HD (1920 x 1080)":
-                                    resultBytes = Converter.Resize(resultBytes, 1920, 1080);
-                                    break;
-                                case "Quad HD (2560 x 1440)":
-                                    resultBytes = Converter.Resize(resultBytes, 2560, 1440);
-                                    break;
-                                case "4K (3840 x 2160)":
-                                    resultBytes = Converter.Resize(resultBytes, 3840, 2160);
-                                    break;
-                            }
-                            break;
-                    }
-
-                    if (formatOutputFile == "Jpeg")
-                    {
-                        resultBytes = Jpeg.JPGCompress(resultBytes, trackBarValue);
-                    }
-
-                    if (formatOutputFile == "Png" && comboBox3.SelectedIndex == 0)
-                    {
-                        resultBytes = Png.transparency(resultBytes);
-                    }
-
-                    if (formatOutputFile == "Gif" && comboBox3.SelectedIndex == 0)
-                    {
-                        resultBytes = Gif.LZWCompress(resultBytes);
-                    }
-
-
-                    label6.Visible = true;
-                    showPicture(pictureBox2, resultBytes);
-
-                    using (MemoryStream ms = new MemoryStream(resultBytes))
-                    {
-                        Image image = Image.FromStream(ms);
-                        Bitmap bm = new Bitmap(image);
-
-                        label6.Text = $"Стало ({comboBox1.Text.ToLower()}, {image.Width}x{image.Height})";
-                    }
+                    case "Jpeg":
+                        resultBytes = Jpeg.AsJpeg(data);
+                        break;
+                    case "Png":
+                        resultBytes = Png.AsPng(data);
+                        break;
+                    case "Gif":
+                        resultBytes = Gif.AsGif(data);
+                        break;
                 }
-                else
+
+                createResolution(imageResolution);
+
+                if (formatOutputFile == "Jpeg")
                 {
-                    MessageBox.Show("Файл не найден, проверьте путь", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    resultBytes = Jpeg.JPGCompress(resultBytes, 100 - trackBar1.Value);
+                }
+
+                if (formatOutputFile == "Png" && comboBox3.Text != "" && comboBox3.SelectedIndex == 0)
+                {
+                    resultBytes = Png.transparency(resultBytes, (int)numericUpDown1.Value, (int)numericUpDown2.Value, (int)numericUpDown3.Value);
+                }
+
+                //if (formatOutputFile == "Gif" && comboBox3.Text != "" && comboBox3.SelectedIndex == 0)
+                //{
+                //    resultBytes = Gif.LZWCompress(resultBytes);
+                //}
+
+
+                label6.Visible = true;
+                showPicture(pictureBox2, resultBytes);
+
+                using (MemoryStream ms = new MemoryStream(resultBytes))
+                {
+                    Image image = Image.FromStream(ms);
+                    Bitmap bm = new Bitmap(image);
+
+                    label6.Text = $"Стало ({comboBox1.Text.ToLower()}, {image.Width}x{image.Height})";
                 }
             }
             else
@@ -143,6 +107,7 @@ namespace Converter_Ver3
                 MessageBox.Show("Не все поля заполнены", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
 
         private void showPicture(PictureBox pictureBox, byte[] data)
         {
@@ -156,13 +121,12 @@ namespace Converter_Ver3
 
         private void Form1_DragDrop(object sender, DragEventArgs e)
         {
-            if(button3.Text != "Изменить путь")
+            if (button3.Text != "Изменить путь")
             {
                 string[] temp = (string[])e.Data.GetData(DataFormats.FileDrop);
                 path = temp[0];
                 textBox1.Text = path;
                 updateInfoAboutImage();
-                button3.Text = "Изменить путь";
             }
         }
 
@@ -183,20 +147,24 @@ namespace Converter_Ver3
         {
             if (comboBox1.Text == "Jpeg")
             {
-                comboBox3.Visible = false;
                 label3.Visible = true;
+                panel2.Visible = false;
+                comboBox3.Visible = false;
                 trackBar1.Visible = true;
                 textBox2.Visible = true;
+                comboBox3.SelectedIndex = -1;
 
                 label3.Text = "Сжатие";
+
                 trackBar1.Minimum = 0;
-                trackBar1.Maximum = 75;
+                trackBar1.Maximum = 100;
+                trackBar1.Value = 0;
                 textBox2.Text = trackBar1.Value.ToString();
-                trackBarValue = 0;
             }
             else if (comboBox1.Text == "Png")
             {
                 label3.Visible = true;
+                comboBox3.SelectedIndex = -1;
                 comboBox3.Visible = true;
                 trackBar1.Visible = false;
                 textBox2.Visible = false;
@@ -205,18 +173,20 @@ namespace Converter_Ver3
             }
             else if (comboBox1.Text == "Gif")
             {
-                label3.Visible = true;
-                comboBox3.Visible = true;
+                comboBox3.SelectedIndex = -1;
+                panel2.Visible = false;
+                comboBox3.Visible = false;
                 trackBar1.Visible = false;
                 textBox2.Visible = false;
 
-                label3.Text = "Cжатие";
+
+                label3.Text = "";
             }
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            if(resultBytes != null)
+            if (resultBytes != null)
             {
                 SaveFileDialog save = new SaveFileDialog();
                 switch (formatOutputFile)
@@ -232,7 +202,7 @@ namespace Converter_Ver3
                         break;
                 }
 
-                save.InitialDirectory = @"D:\";
+                save.InitialDirectory = @"C:\";
 
                 if (save.ShowDialog() == DialogResult.OK)
                 {
@@ -245,17 +215,14 @@ namespace Converter_Ver3
             }
         }
 
-        private void trackBar1_Scroll(object sender, EventArgs e)
-        {
-            textBox2.Text = trackBar1.Value.ToString();
-            trackBarValue = trackBar1.Value;
-        }
+        private void trackBar1_Scroll(object sender, EventArgs e) => textBox2.Text = trackBar1.Value.ToString();
+
 
         private void button3_Click(object sender, EventArgs e)
         {
-            if(button3.Text == "Сохранить путь")
+            if (button3.Text == "Сохранить путь")
             {
-                updateInfoAboutImage(); 
+                updateInfoAboutImage();
             }
             else
             {
@@ -283,6 +250,51 @@ namespace Converter_Ver3
                 textBox1.ReadOnly = true;
                 button3.Text = "Изменить путь";
             }
+            else
+            {
+                MessageBox.Show("Изображения на этом пути не существует", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBox3.SelectedIndex == 0)
+            {
+                panel2.Visible = true;
+                changeBackColorForPNG();
+            }
+            else
+            {
+                panel2.Visible = false;
+                numericUpDown1.Value = 0;
+                numericUpDown2.Value = 0;
+                numericUpDown3.Value = 0;
+            }
+        }
+
+        private void changeBackColorForPNG()
+        {
+            int pixelColorRed = (int)numericUpDown1.Value;
+            int pixelColorGreen = (int)numericUpDown2.Value;
+            int pixelColorBlue = (int)numericUpDown3.Value;
+
+            Color color = Color.FromArgb(pixelColorRed, pixelColorGreen, pixelColorBlue);
+            pictureBox3.BackColor = color;
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            changeBackColorForPNG();
+        }
+
+        private void numericUpDown2_ValueChanged(object sender, EventArgs e)
+        {
+            changeBackColorForPNG();
+        }
+
+        private void numericUpDown3_ValueChanged(object sender, EventArgs e)
+        {
+            changeBackColorForPNG();
         }
     }
 }

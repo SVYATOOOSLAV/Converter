@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BorderInfo.cs" />
     <Compile Include="ConverterPackage\Converter.cs" />
     <Compile Include="ConverterPackage\Gif.cs" />
     <Compile Include="ConverterPackage\Png.cs" />
@@ -56,6 +57,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="ConverterPackage\Jpeg.cs" />
+    <Compile Include="PixelInfo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

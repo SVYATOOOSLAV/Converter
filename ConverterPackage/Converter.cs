@@ -13,6 +13,7 @@ namespace Converter_Ver3
 {
     public class Converter
     {
+
         public static ImageFormat getImageFormat(byte[] data)
         {
             using (MemoryStream inStream = new MemoryStream(data))
@@ -112,27 +113,46 @@ namespace Converter_Ver3
             }
         }
 
-        public static byte[] colorDepth(byte[] data, long value)
+        public static byte[] colorDepth(byte[] data, int newColorDepth)
         {
-            ImageFormat format = getImageFormat(data);
-            ImageCodecInfo pictureEncoder = GetEncoder(format);
-
-            using (MemoryStream inStream = new MemoryStream(data))
-            using (MemoryStream outStream = new MemoryStream())
+            data = Png.AsPng(data);
+            Image image;
+            using(MemoryStream inStream = new MemoryStream(data))
             {
-                Image image = Image.FromStream(inStream);
-
-                var colorDepthEncoder = Encoder.ColorDepth;
-
-                EncoderParameters encoderParameters = new EncoderParameters(1);
-                encoderParameters.Param[0] = new EncoderParameter(colorDepthEncoder, value);
-                image.Save(outStream, pictureEncoder, encoderParameters);
-
-                return outStream.ToArray();
+                image = Image.FromStream(inStream);
             }
-        }
+            Bitmap bitmap = new Bitmap(image);
 
-        public static byte[] transparency(byte[] data, int redPixel, int greenPixel, int bluePixel)
+            Bitmap newBitmap = null;
+            switch (newColorDepth)
+            {
+                case 1:
+                    newBitmap = bitmap.Clone(new Rectangle(0, 0, bitmap.Width, bitmap.Height), PixelFormat.Format1bppIndexed);
+                    break;
+                case 4:
+                    newBitmap = bitmap.Clone(new Rectangle(0, 0, bitmap.Width, bitmap.Height), PixelFormat.Format4bppIndexed);
+                    break;
+                case 8:
+                    newBitmap = bitmap.Clone(new Rectangle(0, 0, bitmap.Width, bitmap.Height), PixelFormat.Format8bppIndexed);
+                    break;
+                case 24:
+                    newBitmap = bitmap.Clone(new Rectangle(0, 0, bitmap.Width, bitmap.Height), PixelFormat.Format24bppRgb);
+                    break;
+            }
+              
+            byte[] imageBytes;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                newBitmap.Save(ms, ImageFormat.Gif);
+                imageBytes = ms.ToArray();
+            }
+
+            return imageBytes;
+        }
+    
+    
+
+        public static byte[] transparency(byte[] data, PixelInfo pixelInfo)
         {
             Image pict = null;
             using (MemoryStream inStream = new MemoryStream(data))
@@ -163,7 +183,9 @@ namespace Converter_Ver3
                                 Color pixelColor = newImage.GetPixel(x, y);
 
                                 // Например, установка полной прозрачности (A=0) для пикселей с определенным условием
-                                if (pixelColor.R > redPixel && pixelColor.B > bluePixel && pixelColor.G > greenPixel) // Ваше условие для изменения прозрачности
+                                if ((pixelColor.R >= pixelInfo.pixelColor.R - pixelInfo.redBorder.leftBorder) && (pixelColor.R <= pixelInfo.pixelColor.R + pixelInfo.redBorder.rightBorder) &&
+                                    (pixelColor.G >= pixelInfo.pixelColor.G - pixelInfo.greenBorder.leftBorder) && (pixelColor.G <= pixelInfo.pixelColor.G + pixelInfo.greenBorder.rightBorder) &&
+                                    (pixelColor.B >= pixelInfo.pixelColor.B - pixelInfo.blueBorder.leftBorder) && (pixelColor.B <= pixelInfo.pixelColor.B + pixelInfo.blueBorder.rightBorder)) // Ваше условие для изменения прозрачности
                                 {
                                     pixelColor = Color.FromArgb(0, pixelColor);
                                 }
@@ -187,3 +209,68 @@ namespace Converter_Ver3
         }
     }
 }
+//using System;
+//using System.Drawing;
+//using System.Drawing.Imaging;
+//using System.IO;
+//using System.Windows.Forms;
+
+//public class GifColorDepthConverter
+//{
+//    public byte[] ConvertColorDepth(byte[] inputBytes, int newColorDepth)
+//    {
+//        // Создаем временный файл для сохранения изображения
+//        string tempFile = Path.GetTempFileName();
+
+//        // Сохраняем входную байтовую последовательность во временный файл
+//        File.WriteAllBytes(tempFile, inputBytes);
+
+//        // Загружаем GIF изображение из временного файла
+//        Image gifImage = Image.FromFile(tempFile);
+
+//        // Создаем новое GIF изображение с новой глубиной цвета
+//        string outputFilePath = Path.ChangeExtension(tempFile, "gif");
+//        using (FileStream fs = new FileStream(outputFilePath, FileMode.Create))
+//        {
+//            using (var gifEncoder = new GifBitmapEncoder())
+//            {
+//                for (int frame = 0; frame < gifImage.GetFrameCount(FrameDimension.Time); frame++)
+//                {
+//                    gifImage.SelectActiveFrame(FrameDimension.Time, frame);
+
+//                    // Изменяем глубину цвета для каждого кадра GIF изображения
+//                    using (Bitmap bmp = new Bitmap(gifImage))
+//                    {
+//                        using (Bitmap newBmp = bmp.Clone(new Rectangle(0, 0, bmp.Width, bmp.Height),
+//                            PixelFormat.Format8bppIndexed))
+//                        {
+//                            var newFrame = System.Drawing.Imaging.FrameDimension.Page;
+//                            gifEncoder.Frames.Add(BitmapFrame.Create(newBmp, null, null, null));
+
+//                            // Устанавливаем новую палитру для GIF изображения
+//                            ColorPalette palette = newBmp.Palette;
+//                            for (int i = 0; i < palette.Entries.Length; i++)
+//                            {
+//                                Color oldColor = palette.Entries[i];
+//                                Color newColor = Color.FromArgb(255, oldColor.R, oldColor.G, oldColor.B);
+//                                palette.Entries[i] = newColor;
+//                            }
+//                            newBmp.Palette = palette;
+//                        }
+//                    }
+//                }
+//                // Сохраняем измененное GIF изображение в поток
+//                gifEncoder.Save(fs);
+//            }
+//        }
+
+//        // Читаем байты из созданного GIF изображения
+//        byte[] outputBytes = File.ReadAllBytes(outputFilePath);
+
+//        // Удаляем временные файлы
+//        File.Delete(tempFile);
+//        File.Delete(outputFilePath);
+
+//        return outputBytes;
+//    }
+//}

@@ -22,6 +22,7 @@ namespace Converter_Ver3
             trackBar1.Visible = false;
             textBox2.Visible = false;
             comboBox3.Visible = false;
+            comboBox4.Visible = false;
             label5.Visible = false;
             label6.Visible = false;
             panel2.Visible = false;
@@ -82,13 +83,27 @@ namespace Converter_Ver3
 
                 if (formatOutputFile == "Png" && comboBox3.Text != "" && comboBox3.SelectedIndex == 0)
                 {
-                    resultBytes = Png.transparency(resultBytes, (int)numericUpDown1.Value, (int)numericUpDown2.Value, (int)numericUpDown3.Value);
+                    Color color = getColorAndChangeBackColor();
+                    try
+                    {
+                        PixelInfo pixelInfo = new PixelInfo(color,
+                        new BorderInfo(int.Parse(textBox3.Text), int.Parse(textBox4.Text)),
+                        new BorderInfo(int.Parse(textBox5.Text), int.Parse(textBox6.Text)),
+                        new BorderInfo(int.Parse(textBox7.Text), int.Parse(textBox8.Text)));
+
+                        resultBytes = Png.transparency(resultBytes, pixelInfo);
+                    }
+                    catch (FormatException)
+                    {
+                        MessageBox.Show(("Некорректные данные границ пикселя"), "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }  
                 }
 
-                //if (formatOutputFile == "Gif" && comboBox3.Text != "" && comboBox3.SelectedIndex == 0)
-                //{
-                //    resultBytes = Gif.LZWCompress(resultBytes);
-                //}
+                if (formatOutputFile == "Gif" && comboBox4.Text != "")
+                {
+                    resultBytes = Gif.colorDepth(resultBytes, int.Parse(comboBox4.Text));
+                }
 
 
                 label6.Visible = true;
@@ -145,9 +160,10 @@ namespace Converter_Ver3
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            label3.Visible = true;
             if (comboBox1.Text == "Jpeg")
             {
-                label3.Visible = true;
+                comboBox4.Visible = false;
                 panel2.Visible = false;
                 comboBox3.Visible = false;
                 trackBar1.Visible = true;
@@ -163,8 +179,7 @@ namespace Converter_Ver3
             }
             else if (comboBox1.Text == "Png")
             {
-                label3.Visible = true;
-                comboBox3.SelectedIndex = -1;
+                comboBox4.Visible = false;
                 comboBox3.Visible = true;
                 trackBar1.Visible = false;
                 textBox2.Visible = false;
@@ -173,14 +188,13 @@ namespace Converter_Ver3
             }
             else if (comboBox1.Text == "Gif")
             {
-                comboBox3.SelectedIndex = -1;
+                comboBox4.Visible = true;
                 panel2.Visible = false;
                 comboBox3.Visible = false;
                 trackBar1.Visible = false;
                 textBox2.Visible = false;
 
-
-                label3.Text = "";
+                label3.Text = "Глубина цвета";
             }
         }
 
@@ -261,7 +275,7 @@ namespace Converter_Ver3
             if (comboBox3.SelectedIndex == 0)
             {
                 panel2.Visible = true;
-                changeBackColorForPNG();
+                getColorAndChangeBackColor();
             }
             else
             {
@@ -272,7 +286,7 @@ namespace Converter_Ver3
             }
         }
 
-        private void changeBackColorForPNG()
+        private Color getColorAndChangeBackColor()
         {
             int pixelColorRed = (int)numericUpDown1.Value;
             int pixelColorGreen = (int)numericUpDown2.Value;
@@ -280,22 +294,24 @@ namespace Converter_Ver3
 
             Color color = Color.FromArgb(pixelColorRed, pixelColorGreen, pixelColorBlue);
             pictureBox3.BackColor = color;
+            return color;
         }
 
         private void numericUpDown1_ValueChanged(object sender, EventArgs e)
         {
-            changeBackColorForPNG();
+            getColorAndChangeBackColor();
         }
 
         private void numericUpDown2_ValueChanged(object sender, EventArgs e)
         {
-            changeBackColorForPNG();
+            getColorAndChangeBackColor();
         }
 
         private void numericUpDown3_ValueChanged(object sender, EventArgs e)
         {
-            changeBackColorForPNG();
+            getColorAndChangeBackColor();
         }
+
     }
 }
 

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Encoder = System.Drawing.Imaging.Encoder;
 
-namespace Converter_Ver3
+namespace Converter
 {
     public partial class Form1 : Form
     {
@@ -33,8 +33,14 @@ namespace Converter_Ver3
         byte[] resultBytes = null;
         string formatOutputFile = null;
 
+        static StringBuilder sbForRed = new StringBuilder();
+        StringBuilder sbForGreen = new StringBuilder();
+        StringBuilder sbForBlue = new StringBuilder();
+
+
         private void createResolution(string imageResolution)
         {
+
             switch (imageResolution)
             {
                 case "Default":
@@ -56,6 +62,7 @@ namespace Converter_Ver3
 
         private void button1_Click(object sender, EventArgs e)
         {
+            pictureBox2.BackColor = Color.Transparent;
             if (button3.Text == "Изменить путь" && textBox1.Text != "" && comboBox1.Text != "" && comboBox2.Text != "")
             {
                 formatOutputFile = comboBox1.Text;
@@ -92,12 +99,13 @@ namespace Converter_Ver3
                         new BorderInfo(int.Parse(textBox7.Text), int.Parse(textBox8.Text)));
 
                         resultBytes = Png.transparency(resultBytes, pixelInfo);
+                        pictureBox2.BackColor = Color.White;
                     }
                     catch (FormatException)
                     {
                         MessageBox.Show(("Некорректные данные границ пикселя"), "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
-                    }  
+                    }
                 }
 
                 if (formatOutputFile == "Gif" && comboBox4.Text != "")
@@ -169,6 +177,7 @@ namespace Converter_Ver3
                 trackBar1.Visible = true;
                 textBox2.Visible = true;
                 comboBox3.SelectedIndex = -1;
+                comboBox4.SelectedIndex = -1;
 
                 label3.Text = "Сжатие";
 
@@ -183,11 +192,13 @@ namespace Converter_Ver3
                 comboBox3.Visible = true;
                 trackBar1.Visible = false;
                 textBox2.Visible = false;
+                comboBox4.SelectedIndex = -1;
 
                 label3.Text = "Прозрачность";
             }
             else if (comboBox1.Text == "Gif")
             {
+                comboBox3.SelectedIndex = -1;
                 comboBox4.Visible = true;
                 panel2.Visible = false;
                 comboBox3.Visible = false;
@@ -244,7 +255,8 @@ namespace Converter_Ver3
                 pictureBox2.Image = null;
                 label5.Text = "";
                 label6.Text = "";
-                panel1.BackColor = Color.White;
+                panel1.BackColor = Color.Transparent;
+                pictureBox2.BackColor = Color.Transparent;
                 textBox1.ReadOnly = false;
                 button3.Text = "Сохранить путь";
             }
@@ -297,21 +309,153 @@ namespace Converter_Ver3
             return color;
         }
 
-        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        private void button4_Click(object sender, EventArgs e)
         {
             getColorAndChangeBackColor();
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (textBox3.Text != "")
+                {
+                    String[] strings = textBox9.Text.Split('-');
+                    int res = (int)numericUpDown1.Value - int.Parse(textBox3.Text);
+                    strings[0] = (res < 0) ? "0" : res.ToString();
+                    textBox9.Text = string.Join("-", strings);
+                }
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("Неверное значение, возврат к значению по умолчанию", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBox3.Text = "0";
+            }
+
+        }
+
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (textBox4.Text != "")
+                {
+                    String[] strings = textBox9.Text.Split('-');
+                    int res = (int)numericUpDown1.Value + int.Parse(textBox4.Text);
+                    strings[1] = (res > 255) ? "255" : res.ToString();
+                    textBox9.Text = string.Join("-", strings);
+                }
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("Неверное значение, возврат к значению по умолчанию", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBox4.Text = "0";
+            }
+
+        }
+
+        private void textBox5_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (textBox5.Text != "")
+                {
+                    String[] strings = textBox10.Text.Split('-');
+                    int res = (int)numericUpDown2.Value - int.Parse(textBox5.Text);
+                    strings[0] = (res < 0) ? "0" : res.ToString();
+                    textBox10.Text = string.Join("-", strings);
+                }
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("Неверное значение, возврат к значению по умолчанию", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBox5.Text = "0";
+            }
+
+
+        }
+
+        private void textBox6_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (textBox6.Text != "")
+                {
+                    String[] strings = textBox10.Text.Split('-');
+                    int res = (int)numericUpDown2.Value + int.Parse(textBox6.Text);
+                    strings[1] = (res > 255) ? "255" : res.ToString();
+                    textBox10.Text = string.Join("-", strings);
+                }
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("Неверное значение, возврат к значению по умолчанию", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBox6.Text = "0";
+            }
+
+
+        }
+
+        private void textBox7_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (textBox7.Text != "")
+                {
+                    String[] strings = textBox11.Text.Split('-');
+                    int res = (int)numericUpDown3.Value - int.Parse(textBox7.Text);
+                    strings[0] = (res < 0) ? "0" : res.ToString();
+                    textBox11.Text = string.Join("-", strings);
+                }
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("Неверное значение, возврат к значению по умолчанию", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBox7.Text = "0";
+            }
+
+        }
+
+        private void textBox8_TextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (textBox8.Text != "")
+                {
+                    String[] strings = textBox11.Text.Split('-');
+                    int res = (int)numericUpDown3.Value + int.Parse(textBox8.Text);
+                    strings[1] = (res > 255) ? "255" : res.ToString();
+                    textBox11.Text = string.Join("-", strings);
+                }
+            }
+            catch (FormatException)
+            {
+                MessageBox.Show("Неверное значение, возврат к значению по умолчанию", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                textBox8.Text = "0";
+            }
+
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            textBox9.Text = $"{numericUpDown1.Value}-{numericUpDown1.Value}";
+            textBox3_TextChanged(sender, e);
+            textBox4_TextChanged(sender, e);
         }
 
         private void numericUpDown2_ValueChanged(object sender, EventArgs e)
         {
-            getColorAndChangeBackColor();
+            textBox10.Text = $"{numericUpDown2.Value}-{numericUpDown2.Value}";
+            textBox5_TextChanged(sender, e);
+            textBox6_TextChanged(sender, e);
         }
 
         private void numericUpDown3_ValueChanged(object sender, EventArgs e)
         {
-            getColorAndChangeBackColor();
+            textBox11.Text = $"{numericUpDown3.Value}-{numericUpDown3.Value}";
+            textBox7_TextChanged(sender, e);
+            textBox8_TextChanged(sender, e);
         }
-
     }
 }
 

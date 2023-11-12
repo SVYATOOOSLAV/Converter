@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Converter_Ver3
+namespace Converter
 {
     public class BorderInfo
     {

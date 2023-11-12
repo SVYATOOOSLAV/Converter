@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Encoder = System.Drawing.Imaging.Encoder;
 
-namespace Converter_Ver3
+namespace Converter
 {
     public class Converter
     {
@@ -77,45 +77,8 @@ namespace Converter_Ver3
             }
         }
 
-        public static byte[] LZWCompress(byte[] data)
-        {
-            //ImageFormat format = getImageFormat(data);
-            //ImageCodecInfo pictureEncoder = GetEncoder(format);
-
-            //using (MemoryStream inStream = new MemoryStream(data))
-            //using (MemoryStream outStream = new MemoryStream())
-            //{
-            //    Image image = Image.FromStream(inStream);
-
-            //    var compressEncoder = Encoder.Compression;
-
-            //    EncoderParameters encoderParameters = new EncoderParameters(1);
-            //    encoderParameters.Param[0] = new EncoderParameter(compressEncoder, (long)EncoderValue.CompressionLZW);
-            //    image.Save(outStream, pictureEncoder, encoderParameters);
-
-            //    return outStream.ToArray();
-            //}
-            ImageFormat format = getImageFormat(data);
-            ImageCodecInfo pictureEncoder = GetEncoder(format);
-
-            using (MemoryStream inStream = new MemoryStream(data))
-            using (MemoryStream outStream = new MemoryStream())
-            {
-                Image image = Image.FromStream(inStream);
-
-                var qualityEncoder = Encoder.Quality;
-
-                EncoderParameters encoderParameters = new EncoderParameters(1);
-                encoderParameters.Param[0] = new EncoderParameter(qualityEncoder, 1000);
-                image.Save(outStream, pictureEncoder, encoderParameters);
-
-                return outStream.ToArray();
-            }
-        }
-
         public static byte[] colorDepth(byte[] data, int newColorDepth)
         {
-            data = Png.AsPng(data);
             Image image;
             using(MemoryStream inStream = new MemoryStream(data))
             {
@@ -209,68 +172,3 @@ namespace Converter_Ver3
         }
     }
 }
-//using System;
-//using System.Drawing;
-//using System.Drawing.Imaging;
-//using System.IO;
-//using System.Windows.Forms;
-
-//public class GifColorDepthConverter
-//{
-//    public byte[] ConvertColorDepth(byte[] inputBytes, int newColorDepth)
-//    {
-//        // Создаем временный файл для сохранения изображения
-//        string tempFile = Path.GetTempFileName();
-
-//        // Сохраняем входную байтовую последовательность во временный файл
-//        File.WriteAllBytes(tempFile, inputBytes);
-
-//        // Загружаем GIF изображение из временного файла
-//        Image gifImage = Image.FromFile(tempFile);
-
-//        // Создаем новое GIF изображение с новой глубиной цвета
-//        string outputFilePath = Path.ChangeExtension(tempFile, "gif");
-//        using (FileStream fs = new FileStream(outputFilePath, FileMode.Create))
-//        {
-//            using (var gifEncoder = new GifBitmapEncoder())
-//            {
-//                for (int frame = 0; frame < gifImage.GetFrameCount(FrameDimension.Time); frame++)
-//                {
-//                    gifImage.SelectActiveFrame(FrameDimension.Time, frame);
-
-//                    // Изменяем глубину цвета для каждого кадра GIF изображения
-//                    using (Bitmap bmp = new Bitmap(gifImage))
-//                    {
-//                        using (Bitmap newBmp = bmp.Clone(new Rectangle(0, 0, bmp.Width, bmp.Height),
-//                            PixelFormat.Format8bppIndexed))
-//                        {
-//                            var newFrame = System.Drawing.Imaging.FrameDimension.Page;
-//                            gifEncoder.Frames.Add(BitmapFrame.Create(newBmp, null, null, null));
-
-//                            // Устанавливаем новую палитру для GIF изображения
-//                            ColorPalette palette = newBmp.Palette;
-//                            for (int i = 0; i < palette.Entries.Length; i++)
-//                            {
-//                                Color oldColor = palette.Entries[i];
-//                                Color newColor = Color.FromArgb(255, oldColor.R, oldColor.G, oldColor.B);
-//                                palette.Entries[i] = newColor;
-//                            }
-//                            newBmp.Palette = palette;
-//                        }
-//                    }
-//                }
-//                // Сохраняем измененное GIF изображение в поток
-//                gifEncoder.Save(fs);
-//            }
-//        }
-
-//        // Читаем байты из созданного GIF изображения
-//        byte[] outputBytes = File.ReadAllBytes(outputFilePath);
-
-//        // Удаляем временные файлы
-//        File.Delete(tempFile);
-//        File.Delete(outputFilePath);
-
-//        return outputBytes;
-//    }
-//}
